@@ -35,5 +35,7 @@ decomposition, since no engine has landed.
 
 ## What runs it today
 
-A RunPod Serverless queue endpoint, `workersMin` 0, in `EU-RO-1` because that is where the
-weight cache is. Weights live at `/runpod-volume`, never in an image.
+Nothing. The endpoint, its template, the registry credential and the 100 GB weight volume were
+deleted on 2026-08-17, and the deletion was verified rather than assumed. `endpoint.json` is the
+recipe for standing it up again, not an inventory of what is there — the expensive thing about a
+torn-down service is remembering its shape, not the machines.

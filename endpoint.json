@@ -1,40 +1,58 @@
 {
   "_comment": [
-    "The RunPod resources this service runs on. Ids are this account's, not portable, and are",
-    "recorded so a person can find them rather than so a script can recreate them -- creating",
-    "an endpoint spends money, which is a decision and not a build step.",
+    "What this service ran on, and what it costs to stand up again.",
     "",
-    "The data center is not a preference. A network volume exists in one data center and an",
-    "endpoint that binds one is pinned there, so the weight cache decides the region."
+    "Nothing is provisioned. The endpoint, the template, the registry credential and the",
+    "100 GB weight volume were all deleted on 2026-08-17 at Ernest's instruction, and the",
+    "deletion was verified rather than assumed: every RunPod listing returns zero.",
+    "",
+    "This file is the recipe, not an inventory. It is here because the expensive thing about",
+    "a torn-down service is not the machines, it is remembering what shape it was."
   ],
-  "networkVolume": {
-    "id": "si631woazi",
-    "name": "fabric-weights",
-    "dataCenterId": "EU-RO-1",
-    "sizeGb": 100,
-    "mountedAt": "/runpod-volume",
-    "holds": ["see-through/weights", "see-through/out"]
-  },
-  "endpoints": [
-    {
-      "id": "f8x4i3wb6cujqq",
-      "name": "see-through-python",
-      "member": "interactor-see-through-python",
-      "image": "ghcr.io/fire/see-through-python:test",
-      "gpuTypeIds": ["NVIDIA GeForce RTX 4090"],
+  "state": "torn down 2026-08-17, verified empty",
+  "standUpAgain": {
+    "1_volume": {
+      "what": "A network volume, 100 GB, and the data center it lives in decides the endpoint's.",
+      "holds": "a HuggingFace cache at <volume>/see-through/hf, about 14 GB",
+      "seenByAPodAt": "the pod's volumeMountPath, /workspace by default",
+      "seenByAWorkerAt": "/runpod-volume",
+      "_note": "The same bytes at two paths, so HF_HOME differs between a pod and a worker. That is the detail most likely to be got wrong on the way back up."
+    },
+    "2_weights": {
+      "command": "HF_HOME=<volume>/see-through/hf python -c 'from huggingface_hub import snapshot_download; ...'",
+      "repos": [
+        "layerdifforg/seethroughv0.0.2_layerdiff3d",
+        "24yearsold/seethroughv0.0.1_marigold",
+        "24yearsold/l2d_sam_iter2"
+      ],
+      "took": "about ten minutes on a 4090 pod",
+      "_note": "Weights never go in an image. An image carrying them re-downloads gigabytes into every cold worker; a volume is written once and read by all of them."
+    },
+    "3_endpoint": {
+      "gpu": "NVIDIA GeForce RTX 4090",
       "workersMin": 0,
       "workersMax": 1,
       "idleTimeout": 5,
       "executionTimeoutMs": 900000,
       "flashboot": true,
-      "_note": "workersMin 0 so an idle endpoint bills nothing; a job pays for its own worker."
+      "_note": "workersMin 0 so an idle endpoint bills nothing and a job pays for its own worker. A queue endpoint rather than load-balancing: the latter caps a request at 5.5 minutes and a decomposition takes about three."
     }
-  ],
-  "_notYetRunning": {
-    "interactor-see-through-cpp": [
-      "Its image builds iceoryx2's C ABI from source and rustc segfaults under qemu-user, so",
-      "it cannot be cross-built from an arm64 machine: qemu: uncaught target signal 11.",
-      "It needs a native amd64 builder, which is what .github/workflows/image.yml is for."
+  },
+  "whatRanHere": {
+    "date": "2026-08-17",
+    "member": "interactor-see-through-python",
+    "provedEndToEnd": [
+      "A job reached the queue, the transport layer put it on the bus, the interactor answered,",
+      "and the reply came back as CBOR. Two jobs: one refused by the production-settings gate",
+      "naming the number it saw, one answered with the missing-weights error naming the volume",
+      "path. Both are correct behaviour of the deployed path.",
+      "",
+      "Warm worker: 789 ms queue delay, 233 ms execution."
+    ],
+    "notProved": [
+      "No decomposition ran through the endpoint. The engine was not wired at the time, so what",
+      "the path carried was a refusal and an error, not layers. seconds/seconds.json holds the",
+      "measurement that did produce layers, and it was taken on a pod rather than through here."
     ]
   }
 }
