@@ -1,7 +1,6 @@
 # service-see-through
 
-One see-through decomposer, as one deployable thing. A **service** packs sides into a release
-and holds no code, only what runs together and why.
+One see-through decomposer as one deployable thing. A **service** packs sides into a release and holds no code, only what runs together and why.
 
 | member | side | why it is here |
 | --- | --- | --- |
@@ -10,8 +9,8 @@ and holds no code, only what runs together and why.
 | `interactor-see-through-python` | 3 | the other, PyTorch, answering the same commands |
 | `contract-bus` | 2 | the shared memory between them, and the envelope |
 
-Two interactors make two images: iceoryx2 names one command service per machine, so two in one
-container would race. The A/B is two endpoints on the same input, holding the transport constant.
+Two interactors mean two images: iceoryx2 names one command service per machine, so the A/B is
+two endpoints on one input, which holds the transport constant.
 
 ## The release ladder
 
@@ -30,12 +29,11 @@ keeps two floors and `seconds/ratchet.py` never nets them: halving cost does not
 slower job, which is the trade two budgets exist to refuse.
 
 Each floor keeps a sample, not a number, because the gate judges against the spread: a
-min-of-one ratchet fails on noise and gets switched off. Today's floors measure the path, not a
-decomposition, since no engine has landed.
+min-of-one ratchet fails on noise and gets switched off. Both floors are empty until a working
+system is measured through the interactor.
 
 ## What runs it today
 
-Nothing. The endpoint, its template, the registry credential and the 100 GB weight volume were
-deleted on 2026-08-17, and the deletion was verified rather than assumed. `endpoint.json` is the
-recipe for standing it up again, not an inventory of what is there — the expensive thing about a
-torn-down service is remembering its shape, not the machines.
+Nothing. The endpoint, its template and the 100 GB weight volume were deleted on 2026-08-17 and
+the deletion was verified. `endpoint.json` is the recipe for standing it up again rather than an
+inventory: what is expensive about a torn-down service is its shape, not its machines.
