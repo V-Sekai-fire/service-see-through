@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Two budgets in SI seconds, and they are never netted against each other. Cost and latency",
+    "are opposed -- batching buys one with the other -- so a cost improvement may not license a",
+    "latency regression, and seconds/ratchet.py keeps them as two independent floors.",
+    "",
+    "Each floor holds its sample rather than a single number, because the gate judges against",
+    "the spread. A min-of-one ratchet fails on noise and then gets ignored.",
+    "",
+    "WHAT THESE MEASURE, AND WHAT THEY DO NOT. There is no engine behind the interactor yet, so",
+    "every job below was answered by the gate or by the missing-weights error. This is the floor",
+    "of the path -- queue, transport layer, bus, interactor, CBOR back -- and says nothing about",
+    "a decomposition. When an engine lands these numbers are replaced, not added to, because a",
+    "floor carried across a change of what is being measured is a gate that only passes for the",
+    "thing that was removed."
+  ],
+  "measured": {
+    "endpoint": "f8x4i3wb6cujqq",
+    "member": "interactor-see-through-python",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "dataCenterId": "EU-RO-1",
+    "date": "2026-08-17",
+    "runs": 6,
+    "excluded": [
+      "One run at delay 9.050s: the endpoint scaling a worker up, which is a different",
+      "distribution from a warm one and would make the sample bimodal. Scale-from-zero is worth",
+      "its own budget and does not have one yet; folding it in here would hide both."
+    ]
+  },
+  "budgets": {
+    "latency_seconds": {
+      "what": "One job, end to end as the caller sees it: RunPod queue delay plus execution, warm worker.",
+      "goal": "down",
+      "opposed_to": "cost_seconds",
+      "samples": [1.195, 1.198, 1.193, 1.201, 1.19]
+    },
+    "cost_seconds": {
+      "what": "Billed GPU seconds for one job: RunPod executionTime, which is what the endpoint charges for.",
+      "goal": "down",
+      "opposed_to": "latency_seconds",
+      "samples": [0.218, 0.188, 0.173, 0.176, 0.163]
+    }
+  }
+}

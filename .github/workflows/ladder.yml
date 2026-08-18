@@ -20,6 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 proof/test_ladder.py
+      # The two budgets are checked against themselves, so a change to the ratchet or to the
+      # recorded floors has to survive its own rule. Measuring the endpoint needs an endpoint
+      # and money, so that is a person's command, not a runner's.
+      - run: python3 proof/test_ratchet.py
 
   step:
     # Only when a tag actually arrives. The rungs below it are read from the tags already on
