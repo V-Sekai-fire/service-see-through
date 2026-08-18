@@ -1,0 +1,39 @@
+name: ladder
+
+# The gate on a promotion, and nothing that performs one.
+#
+# Nothing in this file creates a tag, publishes a release, or moves a rung. Each rung is a
+# claim about evidence a machine cannot supply -- beta says somebody installed it somewhere
+# real, rc says somebody ran the production settings and looked at the layers, release says
+# somebody decided -- so a workflow promoting on a green build would assert all three on
+# nobody's authority. This refuses an illegal tag and never cuts a legal one.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 proof/test_ladder.py
+
+  step:
+    # Only when a tag actually arrives. The rungs below it are read from the tags already on
+    # the remote, so the check sees the same history a person would.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: proof
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: The tag must be a legal step
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          others=$(git tag --list 'v*' | grep -v "^${tag}$" | tr '\n' ' ')
+          echo "checking $tag against: ${others:-(no other tags)}"
+          python3 ladder/ladder.py "$tag" --tags $others

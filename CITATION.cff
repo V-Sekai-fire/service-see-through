@@ -1,0 +1,95 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "service-see-through: the see-through decomposer, packaged as a release"
+abstract: >
+  A service: the packing of a transport layer and two interactors into one
+  deployable thing, and the release ladder that says which rung a tag may take.
+  It holds no code of its own -- what runs together, why the membership is what
+  it is, and the gate on a promotion nobody may automate.
+authors:
+  - family-names: Lee
+    given-names: "K. S. Ernest (iFire)"
+    email: ernest.lee@chibifire.com
+    orcid: "https://orcid.org/0000-0003-4570-1436"
+version: 0.1.0-dev.1
+date-released: "2026-08-17"
+license: MIT
+repository-code: "https://github.com/v-sekai-multiplayer-fabric/service-see-through"
+keywords:
+  - service
+  - release
+  - runpod
+  - serverless
+  - layer-decomposition
+
+references:
+  - type: software
+    title: "transport-runpod: the RunPod Serverless transport layer"
+    authors:
+      - family-names: Lee
+        given-names: "K. S. Ernest (iFire)"
+        orcid: "https://orcid.org/0000-0003-4570-1436"
+    year: 2026
+    url: "https://github.com/v-sekai-multiplayer-fabric/transport-runpod"
+    notes: >
+      The member on side 1. It takes the job off the endpoint queue and puts the
+      command on the bus.
+
+  - type: software
+    title: "interactor-see-through-cpp: single-image layer decomposition, on the command bus"
+    authors:
+      - family-names: Lee
+        given-names: "K. S. Ernest (iFire)"
+        orcid: "https://orcid.org/0000-0003-4570-1436"
+    year: 2026
+    url: "https://github.com/v-sekai-multiplayer-fabric/interactor-see-through-cpp"
+    notes: >
+      One of the two members on side 3, and one half of the A/B.
+
+  - type: software
+    title: "interactor-see-through-python: the reference half of the same A/B"
+    authors:
+      - family-names: Lee
+        given-names: "K. S. Ernest (iFire)"
+        orcid: "https://orcid.org/0000-0003-4570-1436"
+    year: 2026
+    url: "https://github.com/v-sekai-multiplayer-fabric/interactor-see-through-python"
+    notes: >
+      The other member on side 3.
+
+  - type: software
+    title: "contract-bus: the weft plane harness"
+    authors:
+      - family-names: Lee
+        given-names: "K. S. Ernest (iFire)"
+        orcid: "https://orcid.org/0000-0003-4570-1436"
+    year: 2026
+    url: "https://github.com/v-sekai-multiplayer-fabric/contract-bus"
+    notes: >
+      The member on side 2: the shared memory the other three meet on, and the
+      envelope they agree about.
+
+  - type: article
+    title: "See-through: Single-image Layer Decomposition for Anime Characters"
+    authors:
+      - family-names: Lin
+        given-names: Jian
+      - family-names: Li
+        given-names: Chengze
+      - family-names: Qin
+        given-names: Haoyun
+      - family-names: Chan
+        given-names: "Kwun Wang"
+      - family-names: Jin
+        given-names: Yanghua
+      - family-names: Liu
+        given-names: Hanyuan
+      - family-names: Choy
+        given-names: "Chun Wang Stephen"
+      - family-names: Liu
+        given-names: Xueting
+    year: 2026
+    doi: "10.1145/3799902.3811209"
+    publisher:
+      name: "Association for Computing Machinery"
+    notes: "The design the packed interactors serve."

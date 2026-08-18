@@ -1,0 +1,40 @@
+{
+  "_comment": [
+    "The RunPod resources this service runs on. Ids are this account's, not portable, and are",
+    "recorded so a person can find them rather than so a script can recreate them -- creating",
+    "an endpoint spends money, which is a decision and not a build step.",
+    "",
+    "The data center is not a preference. A network volume exists in one data center and an",
+    "endpoint that binds one is pinned there, so the weight cache decides the region."
+  ],
+  "networkVolume": {
+    "id": "si631woazi",
+    "name": "fabric-weights",
+    "dataCenterId": "EU-RO-1",
+    "sizeGb": 100,
+    "mountedAt": "/runpod-volume",
+    "holds": ["see-through/weights", "see-through/out"]
+  },
+  "endpoints": [
+    {
+      "id": "f8x4i3wb6cujqq",
+      "name": "see-through-python",
+      "member": "interactor-see-through-python",
+      "image": "ghcr.io/fire/see-through-python:test",
+      "gpuTypeIds": ["NVIDIA GeForce RTX 4090"],
+      "workersMin": 0,
+      "workersMax": 1,
+      "idleTimeout": 5,
+      "executionTimeoutMs": 900000,
+      "flashboot": true,
+      "_note": "workersMin 0 so an idle endpoint bills nothing; a job pays for its own worker."
+    }
+  ],
+  "_notYetRunning": {
+    "interactor-see-through-cpp": [
+      "Its image builds iceoryx2's C ABI from source and rustc segfaults under qemu-user, so",
+      "it cannot be cross-built from an arm64 machine: qemu: uncaught target signal 11.",
+      "It needs a native amd64 builder, which is what .github/workflows/image.yml is for."
+    ]
+  }
+}
