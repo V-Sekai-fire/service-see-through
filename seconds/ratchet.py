@@ -93,6 +93,16 @@ def check(name: str, candidate: list[float], budgets: dict) -> tuple[str, float,
         )
 
     record = budgets[name]
+
+    # No floor yet. The first measurement of a working system sets one rather than being
+    # compared against nothing -- which is the order Gall's law asks for and the order this
+    # file got wrong once: it recorded floors for a path that produced no output, so the gate
+    # was green, precise, and measuring the absence of the work.
+    if not record["samples"]:
+        updated = json.loads(json.dumps(budgets))
+        updated[name]["samples"] = candidate
+        return "first", 0.0, updated
+
     verdict, z = compare(record["samples"], candidate)
 
     if verdict == "worse":
@@ -119,6 +129,12 @@ def main(argv: list[str]) -> int:
     except (Regressed, KeyError, ValueError) as why:
         print(f"ratchet: {why}", file=sys.stderr)
         return 1
+
+    if verdict == "first":
+        budgets["budgets"] = updated
+        BUDGETS.write_text(json.dumps(budgets, indent=2) + "\n")
+        print(f"ratchet: {name} had no floor; this run is now the one to beat")
+        return 0
 
     print(f"ratchet: {name} is {verdict} (z={z:.2f})")
     if verdict == "better":

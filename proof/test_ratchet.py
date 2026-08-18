@@ -70,6 +70,20 @@ def main():
     except Regressed:
         report(True, "halving cost does not buy a latency regression")
 
+    # An empty floor is set by the first measurement, not compared against nothing. This is
+    # the case that was got wrong: floors were recorded for a path that produced no output.
+    empty = {"latency_seconds": {"samples": []}}
+    v, _, updated = check("latency_seconds", [171.3, 170.8, 172.1, 171.0, 171.6], empty)
+    report(v == "first" and len(updated["latency_seconds"]["samples"]) == 5,
+           "the first measurement of a working system sets the floor")
+
+    # And it still may not be set from too little evidence.
+    try:
+        check("latency_seconds", [171.3], {"latency_seconds": {"samples": []}})
+        report(False, "an empty floor still needs enough samples")
+    except ValueError:
+        report(True, "an empty floor is not set from a single run either")
+
     # Too small a sample says nothing, so it may neither fail the gate nor move it.
     try:
         check("latency_seconds", [0.4] * (MIN_SAMPLES - 1), BUDGETS)
@@ -89,8 +103,16 @@ def main():
     disk = json.loads((ROOT / "seconds/seconds.json").read_text())["budgets"]
     report(set(disk) == {"latency_seconds", "cost_seconds"},
            "seconds.json keeps exactly the two opposed budgets")
-    report(all(len(b["samples"]) >= MIN_SAMPLES for b in disk.values()),
-           "every recorded floor rests on enough samples to have a spread")
+    # A floor is either absent -- no working system measured through it yet -- or rests on
+    # enough runs to have a spread. What is forbidden is a thin floor, because that is the one
+    # that looks like evidence and behaves like noise.
+    report(all(len(b["samples"]) == 0 or len(b["samples"]) >= MIN_SAMPLES for b in disk.values()),
+           "a recorded floor is either absent or rests on enough samples")
+
+    # And the working system it will be measured against is named, with a real artefact.
+    working = json.loads((ROOT / "seconds/seconds.json").read_text())["working"]
+    report(working["run"]["seconds"] > 0 and working["run"]["layers"],
+           "the working system is recorded with its own timing and what it produced")
 
     print("ratchet: FAILED" if FAILURES else "ratchet: all checks passed")
     return 1 if FAILURES else 0

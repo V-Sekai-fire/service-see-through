@@ -1,44 +1,63 @@
 {
   "_comment": [
-    "Two budgets in SI seconds, and they are never netted against each other. Cost and latency",
-    "are opposed -- batching buys one with the other -- so a cost improvement may not license a",
-    "latency regression, and seconds/ratchet.py keeps them as two independent floors.",
+    "Two budgets in SI seconds, never netted against each other. Cost and latency are opposed --",
+    "batching buys one with the other -- so a cost improvement may not license a latency",
+    "regression, and seconds/ratchet.py keeps them as two independent floors.",
     "",
-    "Each floor holds its sample rather than a single number, because the gate judges against",
-    "the spread. A min-of-one ratchet fails on noise and then gets ignored.",
+    "THERE ARE NO FLOORS YET, AND THAT IS THE POINT. This file previously recorded 1.195s of",
+    "latency and 0.184s of cost, measured on a live endpoint whose interactor had no engine: every",
+    "job was answered by the gate or by the missing-weights error. Those were floors on a path",
+    "that decomposed nothing, which is the worst kind of gate -- green, precise, and measuring the",
+    "absence of the work. Gall's law runs the other way: a ratchet starts from a simple system",
+    "that works, and there was none to start from.",
     "",
-    "WHAT THESE MEASURE, AND WHAT THEY DO NOT. There is no engine behind the interactor yet, so",
-    "every job below was answered by the gate or by the missing-weights error. This is the floor",
-    "of the path -- queue, transport layer, bus, interactor, CBOR back -- and says nothing about",
-    "a decomposition. When an engine lands these numbers are replaced, not added to, because a",
-    "floor carried across a change of what is being measured is a gate that only passes for the",
-    "thing that was removed."
+    "There is one now, in `working` below. A floor may be recorded once the working system has",
+    "been measured MIN_SAMPLES times through the interactor, and not before -- one run is an",
+    "anecdote, and the ratchet judges against a spread."
   ],
-  "measured": {
-    "endpoint": "f8x4i3wb6cujqq",
-    "member": "interactor-see-through-python",
-    "gpu": "NVIDIA GeForce RTX 4090",
-    "dataCenterId": "EU-RO-1",
-    "date": "2026-08-17",
-    "runs": 6,
-    "excluded": [
-      "One run at delay 9.050s: the endpoint scaling a worker up, which is a different",
-      "distribution from a warm one and would make the sample bimodal. Scale-from-zero is worth",
-      "its own budget and does not have one yet; folding it in here would hide both."
-    ]
+  "working": {
+    "_comment": [
+      "The simple system that works, and the thing every later number must be compared against.",
+      "It is upstream's pipeline run directly, with no transport layer, no bus and no interactor",
+      "in the picture -- so a regression after this is ours."
+    ],
+    "upstream": "https://github.com/shitagaki-lab/see-through",
+    "licence": "Apache-2.0",
+    "command": "python inference/scripts/inference_psd.py --srcp <image> --save_to_psd",
+    "weights": {
+      "cached_on": "network volume si631woazi, 14 GB",
+      "seen_by_a_pod_at": "/workspace/see-through/hf",
+      "seen_by_a_worker_at": "/runpod-volume/see-through/hf",
+      "_comment": "The same volume. A pod mounts it at its volumeMountPath and a serverless worker at /runpod-volume, so HF_HOME differs between the two for one set of bytes.",
+      "repos": [
+        "layerdifforg/seethroughv0.0.2_layerdiff3d",
+        "24yearsold/seethroughv0.0.1_marigold",
+        "24yearsold/l2d_sam_iter2"
+      ]
+    },
+    "run": {
+      "date": "2026-08-17",
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "dataCenterId": "EU-RO-1",
+      "input": "1280x1280 anime character illustration",
+      "output": "test.psd, 8476354 bytes, 9 named layers with per-layer bounds; test_depth.psd beside it",
+      "layers": ["handwear", "back hair", "bottomwear", "neck", "topwear", "ears", "face", "mouth", "front hair"],
+      "seconds": 171.26,
+      "_seconds_note": "The program's own number for the final stage, not a clock kept outside it. Denoising ran 30 steps at about 1.57 s/step. One run: evidence that it works, not a distribution."
+    }
   },
   "budgets": {
     "latency_seconds": {
-      "what": "One job, end to end as the caller sees it: RunPod queue delay plus execution, warm worker.",
+      "what": "One decomposition, end to end as the caller sees it: queue delay plus execution.",
       "goal": "down",
       "opposed_to": "cost_seconds",
-      "samples": [1.195, 1.198, 1.193, 1.201, 1.19]
+      "samples": []
     },
     "cost_seconds": {
-      "what": "Billed GPU seconds for one job: RunPod executionTime, which is what the endpoint charges for.",
+      "what": "Billed GPU seconds for one decomposition: RunPod executionTime, what the endpoint charges.",
       "goal": "down",
       "opposed_to": "latency_seconds",
-      "samples": [0.218, 0.188, 0.173, 0.176, 0.163]
+      "samples": []
     }
   }
 }
